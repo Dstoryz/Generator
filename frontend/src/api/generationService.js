@@ -29,18 +29,46 @@ export const generationService = {
     }
   },
 
-  async getHistory() {
+  async getHistory(page = 1, perPage = 12) {
     try {
-      console.log('Making history request...');
-      const response = await api.get(ENDPOINTS.HISTORY);
-      console.log('History response:', response);
-      return response.data;
+      const response = await api.get(ENDPOINTS.HISTORY, {
+        params: {
+          page,
+          per_page: perPage
+        }
+      });
+      
+      const data = response.data;
+      
+      if (data && typeof data === 'object' && 'results' in data) {
+        return {
+          results: Array.isArray(data.results) ? data.results : [],
+          count: data.count || 0,
+          next: data.next || null,
+          previous: data.previous || null
+        };
+      }
+      
+      if (Array.isArray(data)) {
+        return {
+          results: data,
+          count: data.length,
+          next: null,
+          previous: null
+        };
+      }
+      
+      console.error('Unexpected response format:', data);
+      return {
+        results: [],
+        count: 0,
+        next: null,
+        previous: null
+      };
+      
     } catch (error) {
       console.error('Error fetching history:', error);
-      if (error.response?.status === 401) {
-        throw new Error('Необходима авторизация');
-      }
-      throw new Error(error.response?.data?.detail || 'Не удалось загрузить историю');
+      throw error;
     }
   },
 

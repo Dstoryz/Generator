@@ -14,6 +14,9 @@
   
   /* Размеры */
   --header-height: 64px;
+  --footer-height: 100px;
+  --footer-mobile-height: 420px;
+  --footer-padding: 48px;
   --sidebar-width: 280px;
   --content-max-width: 1200px;
   
