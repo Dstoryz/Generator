@@ -126,12 +126,13 @@ function HistoryPanel({ onImageSelect, newGeneration }) {
               key={item.id} 
               className="history-panel-item"
               onClick={() => handleCardClick(item)}
-              sx={{ cursor: 'pointer' }}
             >
               {item.generated_image ? (
                 <CardMedia
                   component="img"
-                  image={item.generated_image}
+                  image={item.generated_image.startsWith('http') 
+                    ? item.generated_image 
+                    : `http://localhost:8000${item.generated_image}`}
                   alt={item.prompt}
                   className="history-panel-image"
                 />
@@ -146,6 +147,7 @@ function HistoryPanel({ onImageSelect, newGeneration }) {
                 <Typography className="history-panel-prompt">
                   {item.original_prompt || item.prompt || 'No prompt'}
                 </Typography>
+                
                 <Box className="history-panel-tags">
                   {item.model && (
                     <Chip 
@@ -161,7 +163,61 @@ function HistoryPanel({ onImageSelect, newGeneration }) {
                       className="history-panel-tag"
                     />
                   )}
+                  {item.color_scheme && item.color_scheme !== 'none' && (
+                    <Chip 
+                      label={item.color_scheme}
+                      size="small"
+                      className="history-panel-tag"
+                    />
+                  )}
                 </Box>
+
+                <Box className="history-panel-details">
+                  <Typography variant="caption" className="history-panel-detail">
+                    <strong>Steps:</strong> {item.n_steps || 75}
+                  </Typography>
+                  <Typography variant="caption" className="history-panel-detail">
+                    <strong>CFG:</strong> {item.guidance_scale || 7.5}
+                  </Typography>
+                  <Typography variant="caption" className="history-panel-detail">
+                    <strong>Size:</strong> {item.width}×{item.height}
+                  </Typography>
+                  {item.seed && (
+                    <Typography variant="caption" className="history-panel-detail">
+                      <strong>Seed:</strong> {item.seed}
+                    </Typography>
+                  )}
+                  {item.sampler && (
+                    <Typography variant="caption" className="history-panel-detail">
+                      <strong>Sampler:</strong> {item.sampler}
+                    </Typography>
+                  )}
+                </Box>
+
+                <Box className="history-panel-flags">
+                  {item.tiling && (
+                    <Chip 
+                      label="Tiling"
+                      size="small"
+                      className="history-panel-flag"
+                    />
+                  )}
+                  {item.hires_fix && (
+                    <Chip 
+                      label="Hires.fix"
+                      size="small"
+                      className="history-panel-flag"
+                    />
+                  )}
+                  {item.safety_checker && (
+                    <Chip 
+                      label="Safe"
+                      size="small"
+                      className="history-panel-flag"
+                    />
+                  )}
+                </Box>
+
                 <Box className="history-panel-actions">
                   <Tooltip title="Delete">
                     <IconButton 

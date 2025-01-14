@@ -183,6 +183,57 @@ function GenerationHistory() {
                         className="history-tag"
                       />
                     )}
+                    {item.color_scheme && item.color_scheme !== 'none' && (
+                      <Chip 
+                        label={item.color_scheme}
+                        size="small"
+                        className="history-tag"
+                      />
+                    )}
+                  </Box>
+                  <Box className="history-details">
+                    <Typography variant="caption" className="history-detail">
+                      <strong>Steps:</strong> {item.n_steps || 75}
+                    </Typography>
+                    <Typography variant="caption" className="history-detail">
+                      <strong>CFG:</strong> {item.guidance_scale || 7.5}
+                    </Typography>
+                    <Typography variant="caption" className="history-detail">
+                      <strong>Size:</strong> {item.width}×{item.height}
+                    </Typography>
+                    {item.seed && (
+                      <Typography variant="caption" className="history-detail">
+                        <strong>Seed:</strong> {item.seed}
+                      </Typography>
+                    )}
+                    {item.sampler && (
+                      <Typography variant="caption" className="history-detail">
+                        <strong>Sampler:</strong> {item.sampler}
+                      </Typography>
+                    )}
+                  </Box>
+                  <Box className="history-flags">
+                    {item.tiling && (
+                      <Chip 
+                        label="Tiling"
+                        size="small"
+                        className="history-flag"
+                      />
+                    )}
+                    {item.hires_fix && (
+                      <Chip 
+                        label="Hires.fix"
+                        size="small"
+                        className="history-flag"
+                      />
+                    )}
+                    {item.safety_checker && (
+                      <Chip 
+                        label="Safe"
+                        size="small"
+                        className="history-flag"
+                      />
+                    )}
                   </Box>
                   <Box className="history-actions">
                     {item.generated_image && (

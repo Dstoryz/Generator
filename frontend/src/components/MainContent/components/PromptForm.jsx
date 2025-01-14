@@ -35,7 +35,7 @@ const PromptForm = forwardRef(({ onSubmit, loading }, ref) => {
           value={prompt}
           onChange={(e) => setPrompt(e.target.value)}
           multiline
-          rows={4}
+          rows={3}
           required
           disabled={loading}
           variant="outlined"

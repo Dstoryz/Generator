@@ -1,41 +1,46 @@
 .footer {
   background-color: var(--background-light);
   min-height: var(--footer-height);
-  padding: var(--footer-padding) 0;
+  padding: var(--spacing-md) 0;
   margin-top: auto;
   border-top: 1px solid rgba(255, 255, 255, 0.1);
   width: 100%;
 }
 
-.footer-content {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-  gap: var(--spacing-xl);
-  margin-bottom: var(--spacing-xl);
+.footer-grid {
+  margin-bottom: var(--spacing-sm) !important;
 }
 
 .footer-section {
   display: flex;
   flex-direction: column;
-  gap: var(--spacing-md);
+  gap: var(--spacing-xs);
 }
 
 .footer-title {
   color: var(--text-primary);
+  font-size: 1rem;
   font-weight: 600;
-  margin-bottom: var(--spacing-sm);
+  margin-bottom: var(--spacing-xs);
 }
 
 .footer-subtitle {
   color: var(--text-primary);
-  font-size: 1rem;
+  font-size: 0.9rem;
   font-weight: 600;
-  margin-bottom: var(--spacing-sm);
+  margin-bottom: var(--spacing-xs);
 }
 
 .footer-description {
   color: var(--text-secondary);
+  font-size: 0.8rem;
   line-height: 1.5;
+}
+
+.footer-links {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-xs);
 }
 
 .footer-link {
@@ -43,6 +48,9 @@
   text-decoration: none !important;
   transition: color var(--transition-fast);
   cursor: pointer;
+  font-size: 0.8rem;
+  line-height: 1.5;
+  display: inline-block;
 }
 
 .footer-link:hover {
@@ -50,26 +58,29 @@
 }
 
 .footer-divider {
-  margin: var(--spacing-lg) 0 !important;
+  margin: var(--spacing-sm) 0 !important;
   background-color: rgba(255, 255, 255, 0.1) !important;
 }
 
 .footer-copyright {
   color: var(--text-secondary);
   text-align: center;
+  font-size: 0.8rem;
+  padding: var(--spacing-xs) 0;
 }
 
 @media (max-width: 600px) {
   .footer {
     min-height: var(--footer-mobile-height);
   }
-  
-  .footer-content {
-    grid-template-columns: 1fr;
-    text-align: center;
-  }
 
   .footer-section {
+    text-align: center;
+    align-items: center;
+    margin-bottom: var(--spacing-sm);
+  }
+
+  .footer-links {
     align-items: center;
   }
 } 

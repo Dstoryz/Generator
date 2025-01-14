@@ -3,7 +3,7 @@ import { Box, Typography, Container, Paper, Button } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
 import './Legal.css';
 
-function TermsOfService() {
+function PrivacyPolicy() {
   const navigate = useNavigate();
   const currentDate = new Date().toLocaleDateString();
 
@@ -101,4 +101,4 @@ function TermsOfService() {
   );
 }
 
-export default TermsOfService; 
+export default PrivacyPolicy; 
