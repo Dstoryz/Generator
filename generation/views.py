@@ -217,14 +217,33 @@ class HistoryView(APIView):
 
     def get(self, request):
         try:
-            logger.info(f"Fetching history for user {request.user.id}")
-            history = ImageGenerationRequest.objects.filter(
+            page = int(request.GET.get('page', 1))
+            per_page = int(request.GET.get('per_page', 12))
+            
+            # Получаем все записи пользователя, отсортированные по дате
+            queryset = ImageGenerationRequest.objects.filter(
                 user=request.user
             ).order_by('-created_at')
             
-            logger.info(f"Found {history.count()} items")
-            serializer = ImageGenerationRequestSerializer(history, many=True)
-            return Response(serializer.data)
+            # Вычисляем общее количество записей
+            total_count = queryset.count()
+            
+            # Вычисляем смещение для пагинации
+            start = (page - 1) * per_page
+            end = start + per_page
+            
+            # Получаем записи для текущей страницы
+            paginated_queryset = queryset[start:end]
+            
+            serializer = ImageGenerationRequestSerializer(paginated_queryset, many=True)
+            
+            return Response({
+                'results': serializer.data,
+                'count': total_count,
+                'next': page * per_page < total_count,
+                'previous': page > 1
+            })
+            
         except Exception as e:
             logger.error(f"Error fetching history: {str(e)}")
             return Response(

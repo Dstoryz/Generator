@@ -54,6 +54,31 @@ function MainContent() {
     checkAuth();
   }, []);
 
+  useEffect(() => {
+    // Проверяем наличие сохраненных данных
+    const savedImage = localStorage.getItem('selectedImage');
+    const savedPrompt = localStorage.getItem('selectedPrompt');
+    const savedSettings = localStorage.getItem('selectedSettings');
+
+    if (savedImage && savedPrompt && savedSettings) {
+      try {
+        // Устанавливаем сохраненные данные
+        setSelectedImage(savedImage);
+        if (promptFormRef.current) {
+          promptFormRef.current.setPrompt(savedPrompt);
+        }
+        setSettings(JSON.parse(savedSettings));
+
+        // Очищаем localStorage
+        localStorage.removeItem('selectedImage');
+        localStorage.removeItem('selectedPrompt');
+        localStorage.removeItem('selectedSettings');
+      } catch (error) {
+        console.error('Error restoring saved generation:', error);
+      }
+    }
+  }, []); // Выполняется только при монтировании
+
   const handleSettingsChange = (newSettings) => {
     setSettings(prev => ({
       ...prev,
@@ -61,33 +86,31 @@ function MainContent() {
     }));
   };
 
-  const handleImageSelect = (item) => {
-    const imageUrl = item.generated_image && item.generated_image.startsWith('http')
-      ? item.generated_image
-      : `http://localhost:8000${item.generated_image}`;
+  const handleImageSelect = (image, prompt, settings) => {
+    console.log('MainContent - handleImageSelect called');
+    console.log('Image:', image);
+    console.log('Prompt:', prompt);
+    console.log('Settings:', settings);
 
-    setSelectedImage(imageUrl);
-    
-    setSettings({
-      model: item.model,
-      style: item.style,
-      n_steps: item.n_steps,
-      guidance_scale: item.guidance_scale,
-      seed: item.seed,
-      width: item.width,
-      height: item.height,
-      color_scheme: item.color_scheme,
-      negative_prompt: item.negative_prompt,
-      sampler: item.sampler,
-      clip_skip: item.clip_skip,
-      tiling: item.tiling,
-      hires_fix: item.hires_fix,
-      denoising_strength: item.denoising_strength,
-      safety_checker: item.safety_checker
-    });
+    // Проверяем ref перед использованием
+    if (!promptFormRef.current) {
+      console.error('promptFormRef is not initialized');
+      return;
+    }
 
-    if (promptFormRef.current) {
-      promptFormRef.current.setPrompt(item.original_prompt || item.prompt);
+    try {
+      setSelectedImage(image);
+      promptFormRef.current.setPrompt(prompt);
+      setSettings(prevSettings => {
+        const newSettings = {
+          ...prevSettings,
+          ...settings
+        };
+        console.log('Updated settings:', newSettings);
+        return newSettings;
+      });
+    } catch (error) {
+      console.error('Error in handleImageSelect:', error);
     }
   };
 

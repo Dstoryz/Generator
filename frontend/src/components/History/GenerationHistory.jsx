@@ -38,43 +38,72 @@ function GenerationHistory() {
     try {
       setLoading(true);
       setError(null);
-      
       const response = await generationService.getHistory(page, itemsPerPage);
-      
       if (response && response.results) {
-        setHistory(Array.isArray(response.results) ? response.results : []);
+        setHistory(response.results);
         setTotalItems(response.count || 0);
         setTotalPages(Math.ceil((response.count || 0) / itemsPerPage));
-      } else if (Array.isArray(response)) {
-        setHistory(response);
-        setTotalItems(response.length);
-        setTotalPages(Math.ceil(response.length / itemsPerPage));
-      } else {
-        console.error('Unexpected response structure:', response);
-        setHistory([]);
-        setTotalPages(1);
-        setError('Invalid data format received from server');
       }
     } catch (err) {
-      console.error('Error loading history:', err);
-      setError(err.message || 'Failed to load history');
-      setHistory([]);
-      setTotalPages(1);
+      setError(err.message);
     } finally {
       setLoading(false);
     }
   };
 
-  const handleDelete = async (id) => {
+  const handleCardClick = (item) => {
+    console.log('Card clicked:', item);
+
+    if (!item || !item.generated_image) {
+      console.warn('Invalid item or missing image:', item);
+      return;
+    }
+
+    // Формируем полный URL изображения
+    const imageUrl = item.generated_image.startsWith('http')
+      ? item.generated_image
+      : `http://localhost:8000${item.generated_image}`;
+
+    // Подготавливаем объект с настройками
+    const settings = {
+      model: item.model || 'stable-diffusion-v1-5',
+      style: item.style || 'none',
+      n_steps: item.n_steps || 75,
+      guidance_scale: item.guidance_scale || 7.5,
+      seed: item.seed || '',
+      width: item.width || 512,
+      height: item.height || 512,
+      negative_prompt: item.negative_prompt || '',
+      sampler: item.sampler || 'DPM++ 2M Karras',
+      clip_skip: item.clip_skip || 1,
+      tiling: item.tiling || false,
+      hires_fix: item.hires_fix || false,
+      denoising_strength: item.denoising_strength || 0.7,
+      safety_checker: item.safety_checker !== undefined ? item.safety_checker : true,
+      color_scheme: item.color_scheme || 'none'
+    };
+
+    // Сохраняем данные в localStorage для передачи на главную страницу
+    localStorage.setItem('selectedImage', imageUrl);
+    localStorage.setItem('selectedPrompt', item.original_prompt || item.prompt || '');
+    localStorage.setItem('selectedSettings', JSON.stringify(settings));
+
+    // Переходим на главную страницу
+    navigate('/');
+  };
+
+  const handleDelete = async (id, e) => {
+    e.stopPropagation();
     try {
       await generationService.deleteFromHistory(id);
-      loadHistory(page);
+      loadHistory();
     } catch (err) {
       console.error('Error deleting image:', err);
     }
   };
 
-  const handleDownload = (url, prompt) => {
+  const handleDownload = (url, prompt, e) => {
+    e.stopPropagation();
     try {
       const fullUrl = url.startsWith('http') ? url : `http://localhost:8000${url}`;
       const link = document.createElement('a');
@@ -88,37 +117,10 @@ function GenerationHistory() {
     }
   };
 
-  if (loading) {
-    return (
-      <Box className="history-loading">
-        <CircularProgress />
-      </Box>
-    );
-  }
-
-  if (error) {
-    return (
-      <Box className="history-error">
-        <Typography color="error">{error}</Typography>
-      </Box>
-    );
-  }
-
-  if (!history.length) {
-    return (
-      <Box className="history-empty">
-        <Typography variant="h6" color="textSecondary">
-          No generations found
-        </Typography>
-      </Box>
-    );
-  }
-
   return (
     <Box className="history-container">
       <Box className="history-header">
         <Button
-          variant="contained"
           startIcon={<ArrowBackIcon />}
           onClick={() => navigate('/')}
           className="back-button"
@@ -130,73 +132,84 @@ function GenerationHistory() {
         </Typography>
       </Box>
 
-      <Grid container spacing={3}>
-        {history.map((item) => (
-          <Grid item xs={12} sm={6} md={4} lg={3} key={item.id}>
-            <Card className="history-card">
-              {item.generated_image ? (
-                <CardMedia
-                  component="img"
-                  image={item.generated_image.startsWith('http') 
-                    ? item.generated_image 
-                    : `http://localhost:8000${item.generated_image}`}
-                  alt={item.prompt}
-                  className="history-image"
-                />
-              ) : (
-                <Box className="history-image-placeholder">
-                  <Typography variant="body2" color="textSecondary">
-                    Image not available
+      {loading ? (
+        <Box className="history-loading">
+          <CircularProgress />
+        </Box>
+      ) : error ? (
+        <Box className="history-error">
+          <Typography color="error">{error}</Typography>
+        </Box>
+      ) : (
+        <Grid container spacing={3}>
+          {history.map(item => (
+            <Grid item xs={12} sm={6} md={4} lg={3} key={item.id}>
+              <Card 
+                className="history-card"
+                onClick={() => handleCardClick(item)}
+              >
+                {item.generated_image ? (
+                  <CardMedia
+                    component="img"
+                    image={item.generated_image.startsWith('http') 
+                      ? item.generated_image 
+                      : `http://localhost:8000${item.generated_image}`}
+                    alt={item.prompt}
+                    className="history-image"
+                  />
+                ) : (
+                  <Box className="history-image-placeholder">
+                    <Typography variant="body2">
+                      Image not available
+                    </Typography>
+                  </Box>
+                )}
+                <CardContent className="history-content">
+                  <Typography className="history-prompt">
+                    {item.original_prompt || item.prompt || 'No prompt'}
                   </Typography>
-                </Box>
-              )}
-              <CardContent>
-                <Typography variant="subtitle1" className="history-prompt">
-                  {item.original_prompt || item.prompt || 'No prompt'}
-                </Typography>
-                <Typography variant="caption" className="history-timestamp">
-                  {new Date(item.created_at).toLocaleString()}
-                </Typography>
-                <Box className="history-tags">
-                  {item.model && (
-                    <Chip 
-                      label={item.model} 
-                      size="small" 
-                      className="history-tag"
-                    />
-                  )}
-                  {item.style && item.style !== 'none' && (
-                    <Chip 
-                      label={item.style} 
-                      size="small" 
-                      className="history-tag"
-                    />
-                  )}
-                </Box>
-                <Box className="history-actions">
-                  {item.generated_image && (
-                    <Tooltip title="Download">
+                  <Box className="history-tags">
+                    {item.model && (
+                      <Chip 
+                        label={item.model}
+                        size="small"
+                        className="history-tag"
+                      />
+                    )}
+                    {item.style && item.style !== 'none' && (
+                      <Chip 
+                        label={item.style}
+                        size="small"
+                        className="history-tag"
+                      />
+                    )}
+                  </Box>
+                  <Box className="history-actions">
+                    {item.generated_image && (
+                      <Tooltip title="Download">
+                        <IconButton 
+                          size="small"
+                          onClick={(e) => handleDownload(item.generated_image, item.prompt, e)}
+                        >
+                          <DownloadIcon />
+                        </IconButton>
+                      </Tooltip>
+                    )}
+                    <Tooltip title="Delete">
                       <IconButton 
-                        onClick={() => handleDownload(item.generated_image, item.prompt)}
+                        size="small"
+                        onClick={(e) => handleDelete(item.id, e)}
                       >
-                        <DownloadIcon />
+                        <DeleteIcon />
                       </IconButton>
                     </Tooltip>
-                  )}
-                  <Tooltip title="Delete">
-                    <IconButton 
-                      onClick={() => handleDelete(item.id)}
-                      color="error"
-                    >
-                      <DeleteIcon />
-                    </IconButton>
-                  </Tooltip>
-                </Box>
-              </CardContent>
-            </Card>
-          </Grid>
-        ))}
-      </Grid>
+                  </Box>
+                </CardContent>
+              </Card>
+            </Grid>
+          ))}
+        </Grid>
+      )}
 
       {totalPages > 1 && (
         <Box className="history-pagination">

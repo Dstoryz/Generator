@@ -40,30 +40,16 @@ export const generationService = {
       
       const data = response.data;
       
-      if (data && typeof data === 'object' && 'results' in data) {
-        return {
-          results: Array.isArray(data.results) ? data.results : [],
-          count: data.count || 0,
-          next: data.next || null,
-          previous: data.previous || null
-        };
+      if (!data || typeof data !== 'object') {
+        console.error('Invalid response data:', data);
+        throw new Error('Invalid response format');
       }
       
-      if (Array.isArray(data)) {
-        return {
-          results: data,
-          count: data.length,
-          next: null,
-          previous: null
-        };
-      }
-      
-      console.error('Unexpected response format:', data);
       return {
-        results: [],
-        count: 0,
-        next: null,
-        previous: null
+        results: Array.isArray(data.results) ? data.results : [],
+        count: data.count || 0,
+        next: data.next,
+        previous: data.previous
       };
       
     } catch (error) {

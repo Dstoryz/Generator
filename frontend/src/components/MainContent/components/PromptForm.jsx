@@ -8,7 +8,10 @@ const PromptForm = forwardRef(({ onSubmit, loading }, ref) => {
 
   // Экспортируем метод setPrompt через ref
   useImperativeHandle(ref, () => ({
-    setPrompt: (newPrompt) => setPrompt(newPrompt)
+    setPrompt: (newPrompt) => {
+      console.log('Setting new prompt:', newPrompt);
+      setPrompt(newPrompt);
+    }
   }));
 
   const handleSubmit = (e) => {
