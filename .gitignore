@@ -1,6 +1,7 @@
 # Python
-*.py[cod]
 __pycache__/
+*.py[cod]
+*$py.class
 *.so
 .Python
 env/
@@ -27,10 +28,16 @@ db.sqlite3-journal
 media/
 static/
 
-# Virtual Environment
-venv/
-ENV/
-.env
+# React/Node
+node_modules/
+/frontend/build
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
 
 # IDE
 .idea/
@@ -38,46 +45,10 @@ ENV/
 *.swp
 *.swo
 
-# OS generated files
-.DS_Store
-.DS_Store?
-._*
-.Spotlight-V100
-.Trashes
-ehthumbs.db
-Thumbs.db
-
-# Project specific
-generated_images/
-
-# Frontend
-frontend/node_modules
-frontend/.pnp
-frontend/.pnp.js
-frontend/coverage
-frontend/build
-frontend/.DS_Store
-frontend/.env.local
-frontend/.env.development.local
-frontend/.env.test.local
-frontend/.env.production.local
-frontend/npm-debug.log*
-frontend/yarn-debug.log*
-frontend/yarn-error.log*
-
-# Добавим новые исключения
+# Virtual Environment
+venv/
 .env
-*.pyc
-__pycache__/
-db.sqlite3
-/static
-/media
-.DS_Store
-node_modules/
-/dist
-.env.local
-.env.*.local
 
-# Documentation
-DEVELOPMENT.md
-РАЗРАБОТКА.md 
+# Generated files
+generated/
+thumbnails/ 
