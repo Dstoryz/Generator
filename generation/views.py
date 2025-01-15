@@ -70,6 +70,7 @@ class ImageGenerationRequestView(APIView):
         logger.info(f"Seed: {request.data.get('seed')}")
         logger.info(f"Full request data: {request.data}")
         logger.info(f"Request received from user {request.user.id}")
+        logger.info(f"Tiling: {request.data.get('tiling')}")
         prompt = request.data.get('prompt')
         
         # Переводим промт на английский
@@ -120,7 +121,9 @@ class ImageGenerationRequestView(APIView):
                     seed=request.data.get("seed"),
                     height=request.data.get("height"),
                     width=request.data.get("width"),
-                    safety_checker=request.data.get("safety_checker", False)
+                    safety_checker=request.data.get("safety_checker", False),
+                    tiling=request.data.get("tiling", False),
+                    hires_fix=request.data.get("hires_fix", False)
                 )
                 # Сохранение изображения в модели
                 image_request.generated_image.save(
@@ -171,7 +174,7 @@ class ImageGenerationRequestView(APIView):
             logger.error(f"Failed to load model '{model_name}': {str(e)}")
             raise RuntimeError(f"Could not load model '{model_name}'.")
 
-    def generate_image(self, pipeline, prompt, n_steps, guidance_scale=7.5, seed=None, height=512,width=512, safety_checker=False):
+    def generate_image(self, pipeline, prompt, n_steps, guidance_scale=7.5, seed=None, height=512,width=512, safety_checker=False, tiling=False, hires_fix=False):
         """
         Генерирует изображение с помощью заданного пайплайна.
         """
@@ -193,6 +196,9 @@ class ImageGenerationRequestView(APIView):
         logger.info(f"Hight: {height}")
         logger.info(f"Width: {width}")
         logger.info(f"Safety Checker: {safety_checker}")
+        logger.info(f"Tiling: {tiling}")
+        logger.info(f"Hires Fix: {hires_fix}")
+
         logger.info("=" * 50)
 
         # Генерация изображения с полными параметрами
@@ -203,7 +209,11 @@ class ImageGenerationRequestView(APIView):
             generator=generator,
             height=height,
             width=width,
-            safety_checker=safety_checker
+            safety_checker=safety_checker,
+            tiling=tiling,
+            hires_fix=hires_fix,
+            seed=seed,
+            
         ).images[0]
 
         image_io = io.BytesIO()

@@ -31,7 +31,8 @@ function MainContent() {
     seed: '',
     width: 512,
     height: 512,
-    color_scheme: 'none'
+    color_scheme: 'none',
+    tiling: false,
   });
   const [prompt, setPrompt] = useState('');
 
@@ -128,7 +129,9 @@ function MainContent() {
         width: settings.width,
         height: settings.height,
         color_scheme: settings.color_scheme,
-        safety_checker: settings.safety_checker
+        safety_checker: settings.safety_checker,
+        tiling: settings.tiling,
+        hires_fix: settings.hires_fix,
       });
       setLastGeneration(response);
       setSelectedImage(response.generated_image);

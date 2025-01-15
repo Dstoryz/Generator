@@ -7,6 +7,7 @@ from io import BytesIO
 import os
 import logging
 from django.core.exceptions import ValidationError
+from django.core.validators import MinValueValidator, MaxValueValidator
 
 logger = logging.getLogger(__name__)
 
@@ -25,7 +26,14 @@ class ImageGenerationRequest(models.Model):
     color_scheme = models.CharField(max_length=100, default='none')
     n_steps = models.IntegerField(default=20)
     guidance_scale = models.FloatField(default=7.5)
-    seed = models.IntegerField(null=True, blank=True)
+    seed = models.IntegerField(
+        null=True, 
+        blank=True,
+        validators=[
+            MinValueValidator(-2147483648),  # Минимальное значение 32-битного int
+            MaxValueValidator(2147483647)    # Максимальное значение 32-битного int
+        ]
+    )
     generated_image = models.ImageField(
         upload_to='generated/',
         validators=[validate_image]

@@ -6,7 +6,7 @@ from datetime import datetime
 
 # Конфигурация тестируемого параметра
 TEST_CONFIG = {
-    "parameter": "safety_checker",  # Параметр для тестирования
+    "parameter": "tiling",  # Параметр для тестирования
     "values": [False, True],  # Значения для теста
     "prompt": "A beautiful mountain landscape with a lake at sunset"  # Базовый промпт
 }
@@ -94,3 +94,6 @@ def run_parameter_test():
 
 if __name__ == "__main__":
     run_parameter_test() 
+
+
+    

@@ -72,13 +72,24 @@ function AdvancedSettings({ settings, onChange }) {
     onChange({ seed: newSeed });
   };
 
+  const handleSeedChange = (event) => {
+    const value = parseInt(event.target.value);
+    if (isNaN(value)) {
+        onChange({ seed: '' });
+    } else {
+        // Ограничиваем значение
+        const limitedValue = Math.min(Math.max(value, -2147483648), 2147483647);
+        onChange({ seed: limitedValue });
+    }
+  };
+
   return (
     <Box className="advanced-settings">
       <FormControl fullWidth margin="normal">
         <SettingLabel {...SETTINGS_INFO.seed} />
         <TextField
           value={settings.seed || ''}
-          onChange={(e) => onChange({ seed: e.target.value })}
+          onChange={handleSeedChange}
           type="number"
           InputProps={{
             endAdornment: (
