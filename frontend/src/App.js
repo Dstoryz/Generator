@@ -12,6 +12,7 @@ import './styles/global.css';
 import './styles/transitions.css';
 import ProtectedRoute from './components/ProtectedRoute';
 import TermsOfService from './components/Legal/TermsOfService';
+import PrivacyPolicy from './components/Legal/PrivacyPolicy';
 import Profile from './components/Profile/Profile';
 import GenerationHistory from './components/History/GenerationHistory';
 
@@ -50,6 +51,7 @@ function App() {
             <Route path="/login" element={<LoginPage />} />
             <Route path="/register" element={<RegisterPage />} />
             <Route path="/terms" element={<TermsOfService />} />
+            <Route path="/privacy" element={<PrivacyPolicy />} />
             <Route path="/history" element={
               <ProtectedRoute>
                 <GenerationHistory />
