@@ -1,52 +1,79 @@
 /* MainContent.css */
-.main-container {
-  width: 100%;
-  min-height: calc(100vh - var(--header-height));
+.main-content {
+  height: 100vh;
+  padding: var(--spacing-lg);
   background-color: var(--background-dark);
 }
 
-.main-grid-container {
+.content-wrapper {
   display: grid;
-  grid-template-columns: minmax(250px, 300px) minmax(500px, 1fr) minmax(250px, 300px);
+  grid-template-columns: 300px minmax(auto, 800px) 300px;
   gap: var(--spacing-lg);
-  padding: var(--spacing-lg);
-  max-width: 1920px;
-  margin: 0 auto;
+  height: calc(100vh - 120px);
+  max-width: 100%;
+  margin: 0;
+  justify-content: space-between;
+  padding-top: var(--spacing-xxl);
 }
 
-.main-left-panel,
-.main-content-area,
-.main-settings-panel {
-  background-color: var(--background-light);
+.left-panel {
+  background: var(--surface-dark);
   border-radius: var(--radius-lg);
   overflow: hidden;
+  position: sticky;
+  top: var(--spacing-lg);
 }
 
-.main-content-area {
+.center-panel {
   display: flex;
   flex-direction: column;
-  gap: var(--spacing-lg);
-  padding: var(--spacing-lg);
+  gap: var(--spacing-md);
+  margin: 0 auto;
+  width: 100%;
+  max-width: 800px;
+  padding-top: var(--spacing-xxl);
 }
 
-@media (max-width: 1400px) {
-  .main-grid-container {
-    grid-template-columns: 250px 1fr;
-  }
+.image-section {
+  flex: 1;
+  background: var(--surface-dark);
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 512px;
+  padding: var(--spacing-md);
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
 
-  .main-settings-panel {
-    grid-column: 1 / -1;
+.prompt-section {
+  height: 150px;
+  padding: var(--spacing-md);
+  background: var(--surface-dark);
+  border-radius: var(--radius-lg);
+}
+
+.right-panel {
+  background: var(--surface-dark);
+  border-radius: var(--radius-lg);
+  position: sticky;
+  top: var(--spacing-lg);
+}
+
+/* Медиа-запрос для адаптивности */
+@media (max-width: 1280px) {
+  .content-wrapper {
+    grid-template-columns: 250px minmax(auto, 700px) 250px;
   }
 }
 
-@media (max-width: 1024px) {
-  .main-grid-container {
-    grid-template-columns: 1fr;
-    gap: var(--spacing-md);
-    padding: var(--spacing-md);
-  }
-
-  .main-left-panel {
-    display: none;
-  }
+/* Обновляем стили для изображения в ImageDisplay.css */
+.generated-image {
+  max-width: 100%;
+  max-height: 100%;
+  width: auto;
+  height: auto;
+  object-fit: contain;
+  transition: transform 0.3s ease;
 }

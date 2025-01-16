@@ -12,7 +12,7 @@ urlpatterns = [
     path('generate/', ImageGenerationRequestView.as_view(), name='generate'),
     path('history/', HistoryView.as_view(), name='history'),
     path('history/<int:pk>/', HistoryView.as_view(), name='history-detail'),
-    path('get-csrf-token/', GetCSRFToken.as_view(), name='get-csrf-token'),
+    path('csrf/', GetCSRFToken.as_view(), name='get-csrf-token'),
     path('login/', LoginView.as_view(), name='login'),
 ]
 

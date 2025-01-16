@@ -1,37 +1,11 @@
 import React from 'react';
-import {
-  Dialog,
-  DialogContent,
-  IconButton,
-  Typography,
-  Box
-} from '@mui/material';
-import CloseIcon from '@mui/icons-material/Close';
+import { Dialog, DialogContent } from '@mui/material';
 
-function ImagePreviewDialog({ open, image, onClose }) {
-  if (!image) return null;
-
+function ImagePreviewDialog({ open, onClose, imageUrl }) {
   return (
-    <Dialog 
-      open={open} 
-      onClose={onClose}
-      maxWidth="lg"
-      fullWidth
-    >
-      <Box className="preview-dialog-header">
-        <Typography variant="h6" className="preview-dialog-title">
-          {image.prompt}
-        </Typography>
-        <IconButton onClick={onClose} color="inherit">
-          <CloseIcon />
-        </IconButton>
-      </Box>
-      <DialogContent className="preview-dialog-content">
-        <img
-          src={image.generated_image}
-          alt={image.prompt}
-          className="preview-dialog-image"
-        />
+    <Dialog open={open} onClose={onClose} maxWidth="xl">
+      <DialogContent>
+        <img src={imageUrl} alt="Preview" style={{ width: '100%' }} />
       </DialogContent>
     </Dialog>
   );

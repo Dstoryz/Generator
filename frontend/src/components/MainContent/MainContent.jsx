@@ -1,187 +1,221 @@
-import React, { useState } from 'react';
-import { Box, Paper } from '@mui/material';
-import TabPanel from './components/TabPanel';
+import React, { useState, useEffect, useRef } from 'react';
+import { Box } from '@mui/material';
 import ImageDisplay from './components/ImageDisplay';
+import HistoryPanel from './components/HistoryPanel';
 import PromptForm from './components/PromptForm';
 import Settings from './components/Settings';
-import { useAuth } from '../../hooks/useAuth';
 import { generationService } from '../../api/generationService';
 import './MainContent.css';
-import HistoryPanel from './components/HistoryPanel';
+import PromptTemplates from './components/PromptTemplates';
+import PromptTemplateDialog from './components/PromptTemplateDialog';
 
 function MainContent() {
-  const [activeTab, setActiveTab] = useState(0);
+  const [selectedImage, setSelectedImage] = useState(null);
+  const [lastGeneration, setLastGeneration] = useState(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
-  const [generatedImage, setGeneratedImage] = useState(null);
-  const [lastGeneratedImage, setLastGeneratedImage] = useState(null);
-  const { isAuthenticated } = useAuth();
-
   const [formData, setFormData] = useState({
-    prompt: '',
     model: 'stable-diffusion-v1-5',
-    style: 'base',
-    n_steps: 20,
+    style: 'none',
+    n_steps: 75,
     guidance_scale: 7.5,
     seed: ''
   });
+  const [templateDialogOpen, setTemplateDialogOpen] = useState(false);
+  const [selectedTemplate, setSelectedTemplate] = useState(null);
+  const [settings, setSettings] = useState({
+    model: 'stable-diffusion-v1-5',
+    style: 'none',
+    n_steps: 75,
+    guidance_scale: 7.5,
+    seed: '',
+    width: 512,
+    height: 512,
+    color_scheme: 'none',
+    tiling: false,
+  });
+  const [prompt, setPrompt] = useState('');
 
-  const handleChange = (e) => {
-    const { name, value } = e.target;
-    setFormData(prev => ({
+  const promptFormRef = useRef();
+
+  useEffect(() => {
+    const checkAuth = async () => {
+      try {
+        const token = localStorage.getItem('token');
+        if (!token) {
+          console.error('No authentication token found');
+          return;
+        }
+        console.log('Auth token present:', token);
+      } catch (error) {
+        console.error('Auth check failed:', error);
+      }
+    };
+
+    checkAuth();
+  }, []);
+
+  useEffect(() => {
+    // Проверяем наличие сохраненных данных
+    const savedImage = localStorage.getItem('selectedImage');
+    const savedPrompt = localStorage.getItem('selectedPrompt');
+    const savedSettings = localStorage.getItem('selectedSettings');
+
+    if (savedImage && savedPrompt && savedSettings) {
+      try {
+        // Устанавливаем сохраненные данные
+        setSelectedImage(savedImage);
+        if (promptFormRef.current) {
+          promptFormRef.current.setPrompt(savedPrompt);
+        }
+        setSettings(JSON.parse(savedSettings));
+
+        // Очищаем localStorage
+        localStorage.removeItem('selectedImage');
+        localStorage.removeItem('selectedPrompt');
+        localStorage.removeItem('selectedSettings');
+      } catch (error) {
+        console.error('Error restoring saved generation:', error);
+      }
+    }
+  }, []); // Выполняется только при монтировании
+
+  const handleSettingsChange = (newSettings) => {
+    setSettings(prev => ({
       ...prev,
-      [name]: value
+      ...newSettings
     }));
   };
 
-  const handleTabChange = (event, newValue) => {
-    setActiveTab(newValue);
-  };
+  const handleImageSelect = (image, prompt, settings) => {
+    console.log('MainContent - handleImageSelect called');
+    console.log('Image:', image);
+    console.log('Prompt:', prompt);
+    console.log('Settings:', settings);
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    if (!isAuthenticated) {
-      setError('Please login to generate images');
+    // Проверяем ref перед использованием
+    if (!promptFormRef.current) {
+      console.error('promptFormRef is not initialized');
       return;
     }
-    
+
+    try {
+      setSelectedImage(image);
+      promptFormRef.current.setPrompt(prompt);
+      setSettings(prevSettings => {
+        const newSettings = {
+          ...prevSettings,
+          ...settings
+        };
+        console.log('Updated settings:', newSettings);
+        return newSettings;
+      });
+    } catch (error) {
+      console.error('Error in handleImageSelect:', error);
+    }
+  };
+
+  const handleGenerate = async (promptText) => {
     setLoading(true);
     setError(null);
-    
     try {
-      const currentSeed = formData.seed || Math.floor(Math.random() * 1000000);
-      
-      const result = await generationService.generateImage({
-        ...formData,
-        seed: currentSeed
+      const response = await generationService.generateImage({
+        prompt: promptText,
+        model: settings.model,
+        style: settings.style,
+        n_steps: settings.n_steps,
+        guidance_scale: settings.guidance_scale,
+        seed: settings.seed || undefined,
+        width: settings.width,
+        height: settings.height,
+        color_scheme: settings.color_scheme,
+        safety_checker: settings.safety_checker,
+        tiling: settings.tiling,
+        hires_fix: settings.hires_fix,
       });
-      
-      if (result.generated_image) {
-        setGeneratedImage(result.generated_image);
-        setLastGeneratedImage(result);
-        if (!formData.seed) {
-          setFormData(prev => ({
-            ...prev,
-            seed: currentSeed
-          }));
-        }
-      } else {
-        throw new Error('No image was generated');
-      }
+      setLastGeneration(response);
+      setSelectedImage(response.generated_image);
     } catch (err) {
-      setError(err.response?.data?.detail || err.message || 'Failed to generate image');
-      console.error('Image generation error:', err);
+      setError(err.message);
     } finally {
       setLoading(false);
     }
   };
 
-  const handleRetry = () => {
-    if (formData.prompt) {
-      handleSubmit(new Event('submit'));
+  const handlePromptSubmit = (promptText) => {
+    setPrompt(promptText);
+    handleGenerate(promptText);
+  };
+
+  const handleTemplateSelect = (template) => {
+    if (promptFormRef.current) {
+      promptFormRef.current.setPrompt(template.prompt);
     }
   };
 
-  const handleDownload = async () => {
-    if (!generatedImage) return;
-    
+  const handleSaveTemplate = async (templateData) => {
     try {
-      const response = await fetch(generatedImage);
-      const blob = await response.blob();
-      const url = window.URL.createObjectURL(blob);
-      const link = document.createElement('a');
-      link.href = url;
-      link.download = `generated-image-${Date.now()}.png`;
-      document.body.appendChild(link);
-      link.click();
-      document.body.removeChild(link);
-      window.URL.revokeObjectURL(url);
-    } catch (err) {
-      console.error('Failed to download image:', err);
-      setError('Failed to download image');
+      // TODO: Добавить вызов API для сохранения шаблона
+      console.log('Saving template:', templateData);
+      // После успешного сохранения можно обновить список шаблонов
+      // await loadTemplates();
+    } catch (error) {
+      console.error('Error saving template:', error);
     }
-  };
-
-  const handleShare = async () => {
-    if (!generatedImage) return;
-    
-    try {
-      if (navigator.share) {
-        await navigator.share({
-          title: 'My Generated Image',
-          text: 'Check out this AI-generated image!',
-          url: generatedImage
-        });
-      } else {
-        await navigator.clipboard.writeText(generatedImage);
-        // Здесь можно добавить уведомление о копировании ссылки
-      }
-    } catch (err) {
-      console.error('Failed to share image:', err);
-    }
-  };
-
-  const handleFavorite = async () => {
-    if (!generatedImage) return;
-    
-    try {
-      // TODO: Добавить API для сохранения в избранное
-      console.log('Adding to favorites:', generatedImage);
-      // Здесь можно добавить уведомление
-    } catch (err) {
-      console.error('Failed to add to favorites:', err);
-      setError('Failed to add to favorites');
-    }
-  };
-
-  const handleRestorePrompt = (settings) => {
-    setFormData(settings);
-  };
-
-  const handleImageSelect = (image) => {
-    setGeneratedImage(image);
-    // Сбрасываем ошибки если они были
-    setError(null);
   };
 
   return (
-    <Box className="main-container">
-      <TabPanel activeTab={activeTab} onTabChange={handleTabChange} />
-      
-      <div className="main-grid-container">
-        <Paper className="main-left-panel" elevation={0}>
+    <Box className="main-content">
+      <Box className="content-wrapper">
+        <Box className="left-panel">
+          <PromptTemplates
+            onSelectTemplate={handleTemplateSelect}
+            onAddTemplate={() => setTemplateDialogOpen(true)}
+            onEditTemplate={(template) => {
+              setSelectedTemplate(template);
+              setTemplateDialogOpen(true);
+            }}
+          />
           <HistoryPanel 
-            onRestorePrompt={handleRestorePrompt}
             onImageSelect={handleImageSelect}
-            lastGeneratedImage={lastGeneratedImage}
+            newGeneration={lastGeneration}
           />
-        </Paper>
+        </Box>
 
-        <Paper className="main-content-area" elevation={0}>
-          <ImageDisplay 
-            loading={loading} 
-            generatedImage={generatedImage}
-            error={error}
-            onRetry={handleRetry}
-            onDownload={handleDownload}
-            onShare={handleShare}
-            onFavorite={handleFavorite}
-          />
-          <PromptForm
-            formData={formData}
-            loading={loading}
-            onChange={handleChange}
-            onSubmit={handleSubmit}
-          />
-        </Paper>
+        <Box className="center-panel">
+          <Box className="image-section">
+            <ImageDisplay 
+              image={selectedImage}
+              loading={loading}
+              error={error}
+            />
+          </Box>
+          <Box className="prompt-section">
+            <PromptForm 
+              ref={promptFormRef}
+              onSubmit={handlePromptSubmit}
+              loading={loading}
+            />
+          </Box>
+        </Box>
 
-        <Paper className="main-settings-panel" elevation={0}>
-          <Settings
-            formData={formData}
-            onChange={handleChange}
+        <Box className="right-panel">
+          <Settings 
+            settings={settings}
+            onSettingsChange={handleSettingsChange}
           />
-        </Paper>
-      </div>
+        </Box>
+
+        <PromptTemplateDialog
+          open={templateDialogOpen}
+          template={selectedTemplate}
+          onClose={() => {
+            setTemplateDialogOpen(false);
+            setSelectedTemplate(null);
+          }}
+          onSave={handleSaveTemplate}
+        />
+      </Box>
     </Box>
   );
 }

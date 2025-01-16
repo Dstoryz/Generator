@@ -7,6 +7,7 @@ from io import BytesIO
 import os
 import logging
 from django.core.exceptions import ValidationError
+from django.core.validators import MinValueValidator, MaxValueValidator
 
 logger = logging.getLogger(__name__)
 
@@ -18,18 +19,36 @@ def validate_image(image):
 
 class ImageGenerationRequest(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
-    prompt = models.TextField()
+    original_prompt = models.TextField()  # Оригинальный промт
+    prompt = models.TextField()  # Переведенный промт
     model = models.CharField(max_length=100, default='stable-diffusion-v1-5')
     style = models.CharField(max_length=100, default='base')
+    color_scheme = models.CharField(max_length=100, default='none')
     n_steps = models.IntegerField(default=20)
     guidance_scale = models.FloatField(default=7.5)
-    seed = models.IntegerField(null=True, blank=True)
+    seed = models.IntegerField(
+        null=True, 
+        blank=True,
+        validators=[
+            MinValueValidator(-2147483648),  # Минимальное значение 32-битного int
+            MaxValueValidator(2147483647)    # Максимальное значение 32-битного int
+        ]
+    )
     generated_image = models.ImageField(
         upload_to='generated/',
         validators=[validate_image]
     )
     thumbnail = models.ImageField(upload_to='thumbnails/', null=True, blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
+    width = models.IntegerField(default=512)
+    height = models.IntegerField(default=512)
+    negative_prompt = models.TextField(blank=True)
+    sampler = models.CharField(max_length=50, default="DPM++ 2M Karras")
+    clip_skip = models.IntegerField(default=1)
+    tiling = models.BooleanField(default=False)
+    hires_fix = models.BooleanField(default=False)
+    denoising_strength = models.FloatField(default=0.7)
+    safety_checker = models.BooleanField(default=True)
 
     def __str__(self):
         return self.prompt
@@ -54,3 +73,20 @@ class ImageGenerationRequest(models.Model):
         if not self.thumbnail:
             self.create_thumbnail()
         super().save(*args, **kwargs)
+
+class PromptTemplate(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='prompt_templates')
+    name = models.CharField(max_length=100)
+    prompt = models.TextField()
+    description = models.TextField(blank=True)
+    category = models.CharField(max_length=50, default='general')
+    is_public = models.BooleanField(default=False)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+    safety_checker = models.BooleanField(default=True) # Проверка на безопасность
+    
+    class Meta:
+        ordering = ['-created_at']
+
+    def __str__(self):
+        return self.name

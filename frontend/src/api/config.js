@@ -4,7 +4,11 @@ export const ENDPOINTS = {
   GENERATE: '/generation/generate/',
   HISTORY: '/generation/history/',
   LOGIN: '/login/',
+  REGISTER: '/register/',
   REFRESH: '/token/refresh/',
+  CSRF: '/csrf/',
+  PROFILE: '/users/profile/',
+  USER_STATS: '/users/stats/'
 };
 
 export const API_CONFIG = {

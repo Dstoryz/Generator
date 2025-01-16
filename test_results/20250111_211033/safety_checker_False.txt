@@ -1,0 +1,8 @@
+prompt: A beautiful mountain landscape with a lake at sunset
+negative_prompt: 
+num_inference_steps: 50
+guidance_scale: 7.5
+width: 768
+height: 768
+seed: 31
+safety_checker: False

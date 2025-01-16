@@ -8,6 +8,7 @@
   border-radius: var(--radius-lg) !important;
   overflow: hidden;
   position: relative;
+  border: 2px solid #ff4444;
 }
 
 .image-display-loading,
@@ -50,23 +51,62 @@
 }
 
 .image-display-placeholder {
-  opacity: 0.5;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: var(--spacing-lg);
+  padding: var(--spacing-xl);
+  text-align: center;
+  width: 100%;
+  height: 100%;
+  opacity: 0.85;
   transition: opacity var(--transition-normal);
 }
 
-.image-display-placeholder:hover {
+.image-display-placeholder .MuiSvgIcon-root {
+  font-size: 96px !important;
+  color: var(--text-secondary);
+  margin-bottom: var(--spacing-lg);
   opacity: 0.7;
 }
 
-.image-controls-wrapper {
-  position: absolute;
-  bottom: 0;
-  left: 0;
-  right: 0;
-  padding: var(--spacing-md);
-  background: linear-gradient(transparent, rgba(0, 0, 0, 0.5));
-  opacity: 0;
-  transition: opacity 0.3s ease;
+.placeholder-text {
+  font-size: 1.75rem !important;
+  color: var(--text-primary);
+  max-width: 80%;
+  line-height: 1.5;
+  margin-bottom: var(--spacing-md) !important;
+  font-weight: 500 !important;
+}
+
+.placeholder-subtext {
+  font-size: 1.25rem !important;
+  color: var(--text-secondary);
+  max-width: 80%;
+  line-height: 1.4;
+  opacity: 0.8;
+}
+
+.image-display-loading {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: var(--spacing-xl);
+  padding: var(--spacing-xl);
+  text-align: center;
+}
+
+.image-display-loading .MuiCircularProgress-root {
+  width: 64px !important;
+  height: 64px !important;
+}
+
+.loading-text {
+  font-size: 1.25rem !important;
+  color: var(--text-primary);
+  margin-top: var(--spacing-lg);
 }
 
 .image-display-result:hover .image-controls-wrapper {

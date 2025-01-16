@@ -1,209 +1,149 @@
 .history-panel {
-  padding: var(--spacing-md);
   height: 100%;
   overflow-y: auto;
-}
-
-.history-title {
-  margin-bottom: var(--spacing-lg);
-  color: var(--text-primary);
-}
-
-.history-loading,
-.history-error,
-.history-empty {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  height: 100%;
-  gap: var(--spacing-md);
-}
-
-.history-grid {
-  margin: 0 !important;
-}
-
-.history-item {
-  position: relative;
-  border-radius: var(--radius-md);
-  overflow: hidden;
-  background: var(--surface-dark);
-  transition: transform 0.3s ease;
-}
-
-.history-item:hover {
-  transform: translateY(-4px);
-}
-
-.history-image {
-  width: 100%;
-  aspect-ratio: 1;
-  object-fit: cover;
-  cursor: pointer;
-  transition: transform 0.3s ease;
-}
-
-.history-item:hover .history-image {
-  transform: scale(1.05);
-}
-
-.history-item-content {
   padding: var(--spacing-md);
 }
 
-.history-prompt {
+.history-panel-title {
+  margin-bottom: var(--spacing-lg);
+  color: var(--text-primary);
+  padding-left: var(--spacing-sm);
+}
+
+.history-panel-list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-md);
+}
+
+.history-panel-item {
+  background-color: var(--surface-dark) !important;
+  transition: transform var(--transition-normal), box-shadow var(--transition-normal) !important;
+  cursor: pointer !important;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  overflow: hidden;
+}
+
+.history-panel-item:hover {
+  transform: translateY(-2px);
+  border-color: var(--primary-color);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+}
+
+.history-panel-image {
+  aspect-ratio: 1;
+  object-fit: cover;
+  width: 100%;
+  height: 150px;
+}
+
+.history-panel-content {
+  padding: var(--spacing-sm) !important;
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-xs);
+}
+
+.history-panel-prompt {
+  color: var(--text-primary);
   font-size: 0.875rem;
   margin-bottom: var(--spacing-xs);
-  max-height: 3em;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
   overflow: hidden;
-  text-overflow: ellipsis;
-  position: relative;
 }
 
-/* Добавляем градиент в конце текста */
-.history-prompt::after {
-  content: '';
-  position: absolute;
-  bottom: 0;
-  right: 0;
-  width: 100%;
-  height: 1.5em;
-  background: linear-gradient(transparent, var(--background-light));
-}
-
-.history-timestamp {
-  font-size: 0.75rem;
-  color: var(--text-secondary);
-  margin-bottom: var(--spacing-xs);
-}
-
-.history-details {
+.history-panel-tags {
   display: flex;
-  gap: var(--spacing-md);
+  gap: var(--spacing-xs);
+  flex-wrap: wrap;
+  margin: var(--spacing-xs) 0;
+}
+
+.history-panel-tag {
+  background-color: var(--background-light) !important;
+  color: var(--text-secondary) !important;
+  font-size: 0.75rem !important;
+}
+
+.history-panel-actions {
+  margin-top: var(--spacing-xs);
+  display: flex;
+  justify-content: flex-end;
+  gap: var(--spacing-xs);
+}
+
+.history-panel-delete {
+  color: var(--text-secondary) !important;
+}
+
+.history-panel-delete:hover {
+  color: var(--error-color) !important;
+}
+
+.history-panel-loading,
+.history-panel-error,
+.history-panel-empty {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 200px;
   color: var(--text-secondary);
 }
 
-.history-card {
-  height: 100%;
-  display: flex;
-  flex-direction: column;
-  transition: all 0.2s ease;
-  border-radius: 12px;
-  overflow: hidden;
-}
-
-.history-card-media {
-  position: relative;
-  padding-top: 75%; /* Соотношение 4:3 */
-  background-color: var(--background-paper);
-  overflow: hidden;
-}
-
-.history-card-image {
-  position: absolute !important;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-}
-
-.history-card-header {
+.history-panel-placeholder {
+  height: 150px;
   display: flex;
   align-items: center;
-  justify-content: space-between;
-  margin-bottom: 8px;
-}
-
-.model-chip {
-  font-size: 0.75rem;
-  height: 20px;
-  background-color: var(--primary-light);
-  color: var(--primary-main);
-}
-
-.history-card-date {
-  display: flex;
-  align-items: center;
-  gap: 4px;
+  justify-content: center;
+  background-color: var(--background-light);
   color: var(--text-secondary);
 }
 
-.history-card-content {
-  flex-grow: 1;
-  padding: 12px !important;
+/* Убедимся, что другие элементы не перехватывают клик */
+.history-panel-content,
+.history-panel-image,
+.history-panel-prompt,
+.history-panel-tags {
+  pointer-events: none;
 }
 
-.history-card-prompt {
-  max-height: 4.5em; /* 1.5em * 3 строки */
-  overflow: hidden;
-  text-overflow: ellipsis;
-  position: relative;
-  margin-bottom: var(--spacing-md) !important;
-}
-
-/* Добавляем градиент в конце текста */
-.history-card-prompt::after {
-  content: '';
-  position: absolute;
-  bottom: 0;
-  right: 0;
-  width: 100%;
-  height: 1.5em;
-  background: linear-gradient(transparent, var(--background-light));
-}
-
-.history-card-details {
+.history-panel-details {
   display: grid;
   grid-template-columns: repeat(2, 1fr);
-  gap: 8px;
-  margin-top: 8px;
-  padding-top: 8px;
-  border-top: 1px solid var(--border-color);
+  gap: var(--spacing-xs);
+  margin: var(--spacing-xs) 0;
+  font-size: 0.75rem;
 }
 
-.detail-item {
+.history-panel-detail {
+  color: var(--text-secondary) !important;
+}
+
+.history-panel-detail strong {
+  color: var(--text-primary);
+  font-weight: 500;
+}
+
+.history-panel-flags {
   display: flex;
-  flex-direction: column;
+  gap: var(--spacing-xs);
+  flex-wrap: wrap;
+  margin-top: var(--spacing-xs);
 }
 
-.detail-label {
-  color: var(--text-secondary);
-  margin-bottom: 2px;
+.history-panel-flag {
+  background-color: var(--primary-color) !important;
+  color: white !important;
+  font-size: 0.7rem !important;
+  height: 20px !important;
 }
 
-.history-card-actions {
-  padding: 4px 8px !important;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
+.history-panel-tag {
+  background-color: var(--background-light) !important;
+  color: var(--text-secondary) !important;
+  font-size: 0.75rem !important;
+  height: 24px !important;
 }
 
-.action-buttons {
-  display: flex;
-  gap: 4px;
-}
-
-.expand-button {
-  transition: transform 0.2s ease;
-}
-
-.expand-button.expanded {
-  transform: rotate(180deg);
-}
-
-/* Анимации */
-.history-card {
-  animation: fadeIn 0.3s ease-out;
-}
-
-@keyframes fadeIn {
-  from {
-    opacity: 0;
-    transform: translateY(10px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-} 

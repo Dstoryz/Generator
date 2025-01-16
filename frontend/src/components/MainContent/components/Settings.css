@@ -82,4 +82,75 @@
 /* Стили для уведомлений */
 .settings-panel .MuiAlert-filled {
   border-radius: var(--radius-md);
+}
+
+.settings-content {
+  padding: var(--spacing-md) 0;
+}
+
+.advanced-settings {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-md);
+}
+
+.advanced-settings .MuiSlider-root {
+  margin-top: var(--spacing-sm);
+}
+
+.advanced-settings .MuiFormControlLabel-root {
+  margin: var(--spacing-xs) 0;
+}
+
+.advanced-settings .MuiTooltip-tooltip {
+  font-size: 0.75rem;
+}
+
+.settings-tabs {
+  margin-bottom: var(--spacing-md);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+/* Добавляем стили для иконки Safety Checker */
+.safety-checker-icon {
+  margin-left: var(--spacing-xs);
+  transition: color 0.3s ease;
+}
+
+.safety-checker-label {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-xs);
+}
+
+/* Анимация при переключении */
+.MuiSwitch-root:hover + .safety-checker-icon {
+  transform: scale(1.1);
+}
+
+/* Стили для иконок подсказок */
+.setting-label {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-xs);
+}
+
+.help-icon {
+  opacity: 0.6;
+  transition: opacity 0.2s ease, transform 0.2s ease;
+}
+
+.help-icon:hover {
+  opacity: 1;
+  transform: scale(1.1);
+}
+
+/* Стили для тултипов */
+.MuiTooltip-tooltip {
+  background-color: var(--surface-dark) !important;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  padding: var(--spacing-sm) var(--spacing-md) !important;
+  font-size: 0.75rem !important;
+  max-width: 250px !important;
+  line-height: 1.4;
 } 

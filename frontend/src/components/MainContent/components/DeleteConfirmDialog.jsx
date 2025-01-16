@@ -4,26 +4,19 @@ import {
   DialogTitle,
   DialogContent,
   DialogActions,
-  Button,
-  Typography
+  Button
 } from '@mui/material';
 
 function DeleteConfirmDialog({ open, onClose, onConfirm }) {
   return (
     <Dialog open={open} onClose={onClose}>
-      <DialogTitle>Подтверждение удаления</DialogTitle>
+      <DialogTitle>Confirm Delete</DialogTitle>
       <DialogContent>
-        <Typography>
-          Вы уверены, что хотите удалить это изображение из истории?
-        </Typography>
+        Are you sure you want to delete this image?
       </DialogContent>
       <DialogActions>
-        <Button onClick={onClose} color="primary">
-          Отмена
-        </Button>
-        <Button onClick={onConfirm} color="error" variant="contained">
-          Удалить
-        </Button>
+        <Button onClick={onClose}>Cancel</Button>
+        <Button onClick={onConfirm} color="error">Delete</Button>
       </DialogActions>
     </Dialog>
   );

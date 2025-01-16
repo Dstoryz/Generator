@@ -42,15 +42,21 @@ function RegisterPage() {
 
     setError('');
     try {
-      const response = await authService.register({
+      await authService.register({
         username: values.username,
         email: values.email,
         password: values.password
       });
-      login(response.data);
+      
+      await login({
+        username: values.username,
+        password: values.password
+      });
+      
       navigate('/');
     } catch (err) {
-      setError(err.response?.data?.detail || 'Registration failed');
+      console.error('Registration error:', err);
+      setError(err.message || 'Registration failed');
     }
   };
 

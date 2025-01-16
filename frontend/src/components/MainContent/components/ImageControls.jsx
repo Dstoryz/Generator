@@ -1,31 +1,21 @@
 import React from 'react';
-import { Box, IconButton, Tooltip } from '@mui/material';
-import DownloadIcon from '@mui/icons-material/Download';
-import ShareIcon from '@mui/icons-material/Share';
+import { IconButton, Tooltip } from '@mui/material';
 import FavoriteIcon from '@mui/icons-material/Favorite';
+import DownloadIcon from '@mui/icons-material/Download';
+import DeleteIcon from '@mui/icons-material/Delete';
+import ShareIcon from '@mui/icons-material/Share';
 import './ImageControls.css';
 
-function ImageControls({ onDownload, onShare, onFavorite }) {
+function ImageControls({ onFavorite, onDownload, onDelete, onShare, isFavorite }) {
   return (
-    <Box className="image-controls">
-      <Tooltip title="Скачать изображение">
-        <IconButton onClick={onDownload} color="primary">
-          <DownloadIcon />
+    <div className="image-controls">
+      <Tooltip title="Add to Favorites">
+        <IconButton onClick={onFavorite}>
+          <FavoriteIcon color={isFavorite ? "error" : "inherit"} />
         </IconButton>
       </Tooltip>
-      
-      <Tooltip title="Поделиться">
-        <IconButton onClick={onShare} color="primary">
-          <ShareIcon />
-        </IconButton>
-      </Tooltip>
-      
-      <Tooltip title="В избранное">
-        <IconButton onClick={onFavorite} color="primary">
-          <FavoriteIcon />
-        </IconButton>
-      </Tooltip>
-    </Box>
+      {/* Другие контролы */}
+    </div>
   );
 }
 

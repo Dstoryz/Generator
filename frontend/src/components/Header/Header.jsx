@@ -1,6 +1,7 @@
 import React from 'react';
 import { AppBar, Toolbar, Typography, Button, Box } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
+import HistoryIcon from '@mui/icons-material/History';
 import { useAuth } from '../../hooks/useAuth';
 import './Header.css';
 
@@ -21,6 +22,14 @@ function Header() {
         <Box className="header-buttons">
           {isAuthenticated ? (
             <>
+              <Button 
+                variant="outlined" 
+                color="inherit"
+                onClick={() => navigate('/history')}
+                startIcon={<HistoryIcon />}
+              >
+                History
+              </Button>
               <Button 
                 variant="outlined" 
                 color="inherit"

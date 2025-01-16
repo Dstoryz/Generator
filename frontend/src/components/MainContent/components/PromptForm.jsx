@@ -1,26 +1,43 @@
-import React from 'react';
+import React, { forwardRef, useImperativeHandle, useState } from 'react';
 import { Paper, TextField, Button, Box, Typography } from '@mui/material';
 import SendIcon from '@mui/icons-material/Send';
 import './PromptForm.css';
 
-function PromptForm({ formData, loading, onChange, onSubmit }) {
+const PromptForm = forwardRef(({ onSubmit, loading }, ref) => {
+  const [prompt, setPrompt] = useState('');
+
+  // Экспортируем метод setPrompt через ref
+  useImperativeHandle(ref, () => ({
+    setPrompt: (newPrompt) => {
+      console.log('Setting new prompt:', newPrompt);
+      setPrompt(newPrompt);
+    }
+  }));
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    if (prompt.trim()) {
+      onSubmit(prompt.trim());
+    }
+  };
+
   return (
     <Paper className="prompt-form">
       <Typography variant="h6" className="prompt-form-title">
         Создать изображение
       </Typography>
       
-      <form onSubmit={onSubmit}>
+      <form onSubmit={handleSubmit}>
         <TextField
           className="prompt-input"
           fullWidth
           label="Опишите изображение"
-          name="prompt"
-          value={formData.prompt}
-          onChange={onChange}
+          value={prompt}
+          onChange={(e) => setPrompt(e.target.value)}
           multiline
-          rows={4}
+          rows={3}
           required
+          disabled={loading}
           variant="outlined"
           placeholder="Например: космический корабль в стиле киберпанк"
         />
@@ -29,7 +46,7 @@ function PromptForm({ formData, loading, onChange, onSubmit }) {
           <Button
             type="submit"
             variant="contained"
-            disabled={loading}
+            disabled={loading || !prompt.trim()}
             endIcon={<SendIcon />}
             className="submit-button"
           >
@@ -39,6 +56,6 @@ function PromptForm({ formData, loading, onChange, onSubmit }) {
       </form>
     </Paper>
   );
-}
+});
 
 export default PromptForm; 

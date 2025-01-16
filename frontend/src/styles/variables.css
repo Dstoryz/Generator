@@ -14,6 +14,9 @@
   
   /* Размеры */
   --header-height: 64px;
+  --footer-height: 60px;
+  --footer-mobile-height: 280px;
+  --footer-padding: 24px;
   --sidebar-width: 280px;
   --content-max-width: 1200px;
   
@@ -23,6 +26,7 @@
   --spacing-md: 16px;
   --spacing-lg: 24px;
   --spacing-xl: 32px;
+  --spacing-xxl: 48px;
   
   /* Радиусы */
   --radius-sm: 4px;
