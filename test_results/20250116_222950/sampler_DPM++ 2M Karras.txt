@@ -5,4 +5,4 @@ guidance_scale: 7.5
 width: 768
 height: 768
 seed: 31
-tiling: True
+sampler: DPM++ 2M Karras

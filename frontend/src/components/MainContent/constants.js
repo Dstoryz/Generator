@@ -1,12 +1,14 @@
 export const STYLE_OPTIONS = [
-  { value: 'none', label: 'No Style' },
+  { value: 'none', label: 'None' },
+  { value: 'realistic', label: 'Realistic' },
   { value: 'anime', label: 'Anime' },
-  { value: 'digital-art', label: 'Digital Art' },
-  { value: 'photographic', label: 'Photographic' },
-  { value: 'cartoon', label: 'Cartoon' },
-  { value: 'oil-painting', label: 'Oil Painting' },
+  { value: 'digital_art', label: 'Digital Art' },
+  { value: 'oil_painting', label: 'Oil Painting' },
   { value: 'watercolor', label: 'Watercolor' },
-  { value: 'pixel-art', label: 'Pixel Art' }
+  { value: 'sketch', label: 'Sketch' },
+  { value: 'comic', label: 'Comic' },
+  { value: '3d_render', label: '3D Render' },
+  { value: 'pixel_art', label: 'Pixel Art' },
 ];
 
 export const MODEL_OPTIONS = [
@@ -34,26 +36,19 @@ export const IMAGE_SIZES = [
 ];
 
 export const COLOR_SCHEME = [
-  { value: 'none', label: 'No Color Scheme' },
-  { value: 'vibrant', label: 'Vibrant Colors' },
+  { value: 'none', label: 'None' },
+  { value: 'vibrant', label: 'Vibrant' },
   { value: 'monochrome', label: 'Monochrome' },
-  { value: 'pastel', label: 'Pastel Colors' },
-  { value: 'dark', label: 'Dark Tones' },
-  { value: 'neon', label: 'Neon Colors' },
-  { value: 'sepia', label: 'Sepia Tones' },
-  { value: 'vintage', label: 'Vintage Colors' },
-  { value: 'cyberpunk', label: 'Cyberpunk Colors' },
-  { value: 'autumn', label: 'Autumn Colors' },
-  { value: 'winter', label: 'Winter Colors' },
-  { value: 'summer', label: 'Summer Colors' },
-  { value: 'spring', label: 'Spring Colors' },
-  { value: 'muted', label: 'Muted Colors' },
-  { value: 'earthy', label: 'Earth Tones' },
-  { value: 'rainbow', label: 'Rainbow Colors' },
-  { value: 'duotone', label: 'Duotone' },
-  { value: 'noir', label: 'Film Noir' },
-  { value: 'watercolor', label: 'Watercolor Palette' },
-  { value: 'synthwave', label: 'Synthwave Colors' }
+  { value: 'pastel', label: 'Pastel' },
+  { value: 'dark', label: 'Dark' },
+  { value: 'neon', label: 'Neon' },
+  { value: 'sepia', label: 'Sepia' },
+  { value: 'vintage', label: 'Vintage' },
+  { value: 'cyberpunk', label: 'Cyberpunk' },
+  { value: 'autumn', label: 'Autumn' },
+  { value: 'winter', label: 'Winter' },
+  { value: 'summer', label: 'Summer' },
+  { value: 'spring', label: 'Spring' },
 ];
 
 export const SAMPLER_OPTIONS = [

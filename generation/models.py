@@ -36,9 +36,14 @@ class ImageGenerationRequest(models.Model):
     )
     generated_image = models.ImageField(
         upload_to='generated/',
-        validators=[validate_image]
+        null=True,
+        blank=True
     )
-    thumbnail = models.ImageField(upload_to='thumbnails/', null=True, blank=True)
+    thumbnail = models.ImageField(
+        upload_to='thumbnails/',
+        null=True,
+        blank=True
+    )
     created_at = models.DateTimeField(auto_now_add=True)
     width = models.IntegerField(default=512)
     height = models.IntegerField(default=512)

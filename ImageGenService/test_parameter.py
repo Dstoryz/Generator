@@ -6,8 +6,8 @@ from datetime import datetime
 
 # Конфигурация тестируемого параметра
 TEST_CONFIG = {
-    "parameter": "tiling",  # Параметр для тестирования
-    "values": [False, True],  # Значения для теста
+    "parameter": "sampler",  # Параметр для тестирования
+    "values": ["DPM++ 2M Karras", "Euler a", "UniPC"],  # Значения для теста
     "prompt": "A beautiful mountain landscape with a lake at sunset"  # Базовый промпт
 }
 

@@ -4,28 +4,13 @@ import { ENDPOINTS, API_CONFIG } from './config';
 export const generationService = {
   async generateImage(data) {
     try {
-      const response = await api.post(ENDPOINTS.GENERATE, {
-        prompt: data.prompt,
-        model: data.model,
-        style: data.style,
-        n_steps: data.n_steps,
-        guidance_scale: data.guidance_scale,
-        seed: data.seed,
-        width: data.width,
-        height: data.height,
-        negative_prompt: data.negative_prompt,
-        sampler: data.sampler,
-        clip_skip: data.clip_skip,
-        tiling: data.tiling,
-        hires_fix: data.hires_fix,
-        denoising_strength: data.denoising_strength,
-        safety_checker: data.safety_checker,
-        color_scheme: data.color_scheme
-      });
+      console.log('Sending data to server:', data);
+      const response = await api.post(ENDPOINTS.GENERATE, data);
+      console.log('Server response:', response.data);
       return response.data;
     } catch (error) {
-      console.error('Image generation error:', error);
-      throw error;
+      console.error('Generation error:', error.response?.data || error);
+      throw new Error(error.response?.data?.detail || 'Failed to generate image');
     }
   },
 
@@ -38,23 +23,20 @@ export const generationService = {
         }
       });
       
-      const data = response.data;
-      
-      if (!data || typeof data !== 'object') {
-        console.error('Invalid response data:', data);
-        throw new Error('Invalid response format');
+      if (!response.data) {
+        throw new Error('No data received from server');
       }
       
       return {
-        results: Array.isArray(data.results) ? data.results : [],
-        count: data.count || 0,
-        next: data.next,
-        previous: data.previous
+        results: response.data.results || [],
+        count: response.data.count || 0,
+        next: response.data.next,
+        previous: response.data.previous
       };
       
     } catch (error) {
       console.error('Error fetching history:', error);
-      throw error;
+      throw new Error(error.response?.data?.detail || 'Failed to fetch history');
     }
   },
 
@@ -71,6 +53,18 @@ export const generationService = {
       await api.get(ENDPOINTS.CSRF);
     } catch (error) {
       console.error('Failed to get CSRF token:', error);
+    }
+  },
+
+  async getModelParameters(modelName) {
+    try {
+      const response = await api.get(
+        ENDPOINTS.MODEL_PARAMETERS.replace(':modelName', modelName)
+      );
+      return response.data;
+    } catch (error) {
+      console.error('Error fetching model parameters:', error);
+      throw error;
     }
   }
 }; 

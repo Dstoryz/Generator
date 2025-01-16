@@ -31,25 +31,23 @@ function GenerationHistory() {
   const itemsPerPage = 12;
 
   useEffect(() => {
-    loadHistory();
-  }, [page]);
-
-  const loadHistory = async () => {
-    try {
-      setLoading(true);
-      setError(null);
-      const response = await generationService.getHistory(page, itemsPerPage);
-      if (response && response.results) {
-        setHistory(response.results);
-        setTotalItems(response.count || 0);
-        setTotalPages(Math.ceil((response.count || 0) / itemsPerPage));
+    const fetchHistory = async () => {
+      try {
+        setLoading(true);
+        setError(null);
+        const data = await generationService.getHistory(page);
+        setHistory(data.results);
+        setTotalPages(Math.ceil(data.count / itemsPerPage));
+      } catch (err) {
+        console.error('Failed to fetch history:', err);
+        setError(err.message);
+      } finally {
+        setLoading(false);
       }
-    } catch (err) {
-      setError(err.message);
-    } finally {
-      setLoading(false);
-    }
-  };
+    };
+
+    fetchHistory();
+  }, [page]);
 
   const handleCardClick = (item) => {
     console.log('Card clicked:', item);
