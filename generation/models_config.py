@@ -71,13 +71,13 @@ MODEL_CONFIG = {
                 "enabled": True
             },
             "width": {
-                "options": [768, 1024],
-                "default": 768,
+                "options": [512, 768, 1024],
+                "default": 512,
                 "enabled": True
             },
             "height": {
-                "options": [768, 1024],
-                "default": 768,
+                "options": [512, 768, 1024],
+                "default": 512,
                 "enabled": True
             },
             "sampler": {
