@@ -35,6 +35,7 @@ function MainContent() {
     tiling: false,
   });
   const [prompt, setPrompt] = useState('');
+  const [modelParameters, setModelParameters] = useState(null);
 
   const promptFormRef = useRef();
 
@@ -142,9 +143,44 @@ function MainContent() {
     }
   };
 
-  const handlePromptSubmit = (promptText) => {
-    setPrompt(promptText);
-    handleGenerate(promptText);
+  const handlePromptSubmit = async (prompt) => {
+    try {
+      setLoading(true);
+      setError(null);
+      
+      const requestData = {
+        prompt,
+        model: settings.model || 'stable-diffusion-v1-5',
+        style: settings.style || 'none',
+        n_steps: parseInt(settings.n_steps) || 20,
+        guidance_scale: parseFloat(settings.guidance_scale) || 7.5,
+        width: parseInt(settings.width) || 512,
+        height: parseInt(settings.height) || 512,
+        color_scheme: settings.color_scheme || 'none',
+        safety_checker: settings.safety_checker ?? true,
+        tiling: settings.tiling || false,
+        hires_fix: settings.hires_fix || false,
+        seed: settings.seed ? parseInt(settings.seed) : null,
+        negative_prompt: settings.negative_prompt || ''
+      };
+
+      console.log('Sending generation request:', requestData);
+      
+      const response = await generationService.generateImage(requestData);
+      console.log('Generation response:', response);
+      
+      if (response && response.generated_image) {
+        setLastGeneration(response);
+        setSelectedImage(response.generated_image);
+      } else {
+        throw new Error('No image generated');
+      }
+    } catch (error) {
+      console.error('Generation error:', error);
+      setError(error.response?.data?.detail || error.message);
+    } finally {
+      setLoading(false);
+    }
   };
 
   const handleTemplateSelect = (template) => {
@@ -163,6 +199,41 @@ function MainContent() {
       console.error('Error saving template:', error);
     }
   };
+
+  useEffect(() => {
+    const loadModelParameters = async () => {
+      try {
+        const params = await generationService.getModelParameters(settings.model);
+        setModelParameters(params);
+        
+        setSettings(prev => ({
+          ...prev,
+          n_steps: prev.n_steps || params.steps.default,
+          guidance_scale: prev.guidance_scale || params.guidance_scale.default,
+          width: prev.width || params.width.default,
+          height: prev.height || params.height.default,
+          sampler: prev.sampler || params.sampler.default
+        }));
+      } catch (error) {
+        console.error('Error loading model parameters:', error);
+        // Можно добавить отображение ошибки пользователю
+        setError('Failed to load model parameters. Using default settings.');
+        
+        // Установка параметров по умолчанию в случае ошибки
+        setModelParameters({
+          steps: { default: 50, min: 20, max: 100, step: 1 },
+          guidance_scale: { default: 7.5, min: 1, max: 20, step: 0.5 },
+          width: { default: 512, options: [512, 768] },
+          height: { default: 512, options: [512, 768] },
+          sampler: { default: "DPM++ 2M Karras", options: ["DPM++ 2M Karras", "Euler a"] }
+        });
+      }
+    };
+
+    if (settings.model) {
+      loadModelParameters();
+    }
+  }, [settings.model]);
 
   return (
     <Box className="main-content">
@@ -203,6 +274,7 @@ function MainContent() {
           <Settings 
             settings={settings}
             onSettingsChange={handleSettingsChange}
+            modelParameters={modelParameters}
           />
         </Box>
 

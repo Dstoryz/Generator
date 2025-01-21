@@ -8,7 +8,8 @@ export const ENDPOINTS = {
   REFRESH: '/token/refresh/',
   CSRF: '/csrf/',
   PROFILE: '/users/profile/',
-  USER_STATS: '/users/stats/'
+  USER_STATS: '/users/stats/',
+  MODEL_PARAMETERS: '/generation/models/:modelName/parameters/',
 };
 
 export const API_CONFIG = {

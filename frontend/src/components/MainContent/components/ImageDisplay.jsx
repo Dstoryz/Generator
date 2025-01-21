@@ -26,6 +26,9 @@ function ImageDisplay({ image, loading, error }) {
             src={image} 
             alt="Generated" 
             className="generated-image"
+            onError={(e) => {
+              console.error('Error loading image:', e);
+            }}
           />
           <ImageControls />
         </Box>

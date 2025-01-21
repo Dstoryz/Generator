@@ -3,7 +3,8 @@ from .views import (
     ImageGenerationRequestView,
     HistoryView,
     GetCSRFToken,
-    LoginView
+    LoginView,
+    ModelParametersView
 )
 
 app_name = 'generation'
@@ -14,5 +15,6 @@ urlpatterns = [
     path('history/<int:pk>/', HistoryView.as_view(), name='history-detail'),
     path('csrf/', GetCSRFToken.as_view(), name='get-csrf-token'),
     path('login/', LoginView.as_view(), name='login'),
+    path('models/<str:model_name>/parameters/', ModelParametersView.as_view(), name='model-parameters'),
 ]
 
