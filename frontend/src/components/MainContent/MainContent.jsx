@@ -14,13 +14,7 @@ function MainContent() {
   const [lastGeneration, setLastGeneration] = useState(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
-  const [formData, setFormData] = useState({
-    model: 'stable-diffusion-v1-5',
-    style: 'none',
-    n_steps: 75,
-    guidance_scale: 7.5,
-    seed: ''
-  });
+
   const [templateDialogOpen, setTemplateDialogOpen] = useState(false);
   const [selectedTemplate, setSelectedTemplate] = useState(null);
   const [settings, setSettings] = useState({
@@ -34,7 +28,7 @@ function MainContent() {
     color_scheme: 'none',
     tiling: false,
   });
-  const [prompt, setPrompt] = useState('');
+
 
   const promptFormRef = useRef();
 
@@ -143,7 +137,7 @@ function MainContent() {
   };
 
   const handlePromptSubmit = (promptText) => {
-    setPrompt(promptText);
+ 
     handleGenerate(promptText);
   };
 

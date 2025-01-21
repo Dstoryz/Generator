@@ -15,8 +15,7 @@ import {
 } from '@mui/material';
 import HelpOutlineIcon from '@mui/icons-material/HelpOutline';
 import RefreshIcon from '@mui/icons-material/Refresh';
-import ExplicitIcon from '@mui/icons-material/Explicit';
-import ReportProblemIcon from '@mui/icons-material/ReportProblem';
+
 import { 
   SAMPLER_OPTIONS, 
   ADVANCED_SETTINGS 

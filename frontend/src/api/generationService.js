@@ -1,5 +1,5 @@
 import api from './api';
-import { ENDPOINTS, API_CONFIG } from './config';
+import { ENDPOINTS } from './config';
 
 export const generationService = {
   async generateImage(data) {

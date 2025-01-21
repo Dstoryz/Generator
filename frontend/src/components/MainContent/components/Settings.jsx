@@ -13,7 +13,6 @@ import {
   MODEL_OPTIONS,
   STYLE_OPTIONS,
   COLOR_SCHEME,
-  SAMPLER_OPTIONS,
   RESOLUTION_OPTIONS,
 } from '../constants';
 import AdvancedSettings from './AdvancedSettings';
