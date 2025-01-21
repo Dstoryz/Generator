@@ -177,3 +177,15 @@ if not os.path.exists(LOGS_DIR):
 if DEBUG:
     MIDDLEWARE += ['whitenoise.middleware.WhiteNoiseMiddleware']
     STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
+
+# Настройки Swagger
+SWAGGER_SETTINGS = {
+    'SECURITY_DEFINITIONS': {
+        'Bearer': {
+            'type': 'apiKey',
+            'name': 'Authorization',
+            'in': 'header'
+        }
+    },
+    'USE_SESSION_AUTH': False,
+}
