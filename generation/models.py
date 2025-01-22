@@ -8,6 +8,7 @@ import os
 import logging
 from django.core.exceptions import ValidationError
 from django.core.validators import MinValueValidator, MaxValueValidator
+from storages.backends.s3boto3 import S3Boto3Storage
 
 logger = logging.getLogger(__name__)
 
@@ -36,11 +37,13 @@ class ImageGenerationRequest(models.Model):
     )
     generated_image = models.ImageField(
         upload_to='generated/',
+        storage=S3Boto3Storage(),
         null=True,
         blank=True
     )
     thumbnail = models.ImageField(
         upload_to='thumbnails/',
+        storage=S3Boto3Storage(),
         null=True,
         blank=True
     )

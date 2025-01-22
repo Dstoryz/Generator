@@ -13,4 +13,7 @@ accelerate==0.27.0
 transformers==4.36.0
 sentencepiece==0.1.99
 protobuf==4.25.1
-sacremoses==0.0.53 
+sacremoses==0.0.53
+django-storages==1.14.2
+boto3==1.34.7
+requests==2.31.0 
