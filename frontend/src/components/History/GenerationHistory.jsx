@@ -1,23 +1,23 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import {
   Box,
+  Typography,
   Grid,
   Card,
   CardMedia,
   CardContent,
-  Typography,
-  Pagination,
-  CircularProgress,
   Chip,
+  Button,
+  CircularProgress,
+  Pagination,
   IconButton,
-  Tooltip,
-  Button
 } from '@mui/material';
-import DownloadIcon from '@mui/icons-material/Download';
-import DeleteIcon from '@mui/icons-material/Delete';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
+import DeleteIcon from '@mui/icons-material/Delete';
 import { useNavigate } from 'react-router-dom';
 import { generationService } from '../../api/generationService';
+import DeleteConfirmDialog from '../MainContent/components/DeleteConfirmDialog';
+import ImagePreviewDialog from '../MainContent/components/ImagePreviewDialog';
 import './GenerationHistory.css';
 
 function GenerationHistory() {
@@ -27,36 +27,34 @@ function GenerationHistory() {
   const [error, setError] = useState(null);
   const [page, setPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
-  const [totalItems, setTotalItems] = useState(0);
+  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+  const [selectedImage, setSelectedImage] = useState(null);
+  const [previewDialogOpen, setPreviewDialogOpen] = useState(false);
   const itemsPerPage = 12;
 
-  useEffect(() => {
-    const fetchHistory = async () => {
-      try {
-        setLoading(true);
-        setError(null);
-        const data = await generationService.getHistory(page);
-        setHistory(data.results);
-        setTotalPages(Math.ceil(data.count / itemsPerPage));
-      } catch (err) {
-        console.error('Failed to fetch history:', err);
-        setError(err.message);
-      } finally {
-        setLoading(false);
+  const loadHistory = useCallback(async () => {
+    try {
+      setLoading(true);
+      setError(null);
+      const response = await generationService.getHistory(page, itemsPerPage);
+      
+      if (response && response.results) {
+        setHistory(response.results);
+        setTotalPages(Math.ceil(response.count / itemsPerPage));
       }
-    };
+    } catch (err) {
+      console.error('Error loading history:', err);
+      setError('Failed to load history');
+    } finally {
+      setLoading(false);
+    }
+  }, [page, itemsPerPage]);
 
-    fetchHistory();
-  }, [page]);
+  useEffect(() => {
+    loadHistory();
+  }, [loadHistory]);
 
   const handleCardClick = (item) => {
-    console.log('Card clicked:', item);
-
-    if (!item || !item.generated_image) {
-      console.warn('Invalid item or missing image:', item);
-      return;
-    }
-
     // Формируем полный URL изображения
     const imageUrl = item.generated_image.startsWith('http')
       ? item.generated_image
@@ -81,39 +79,50 @@ function GenerationHistory() {
       color_scheme: item.color_scheme || 'none'
     };
 
-    // Сохраняем данные в localStorage для передачи на главную страницу
+    // Сохраняем данные в localStorage
     localStorage.setItem('selectedImage', imageUrl);
-    localStorage.setItem('selectedPrompt', item.original_prompt || item.prompt || '');
+    localStorage.setItem('selectedPrompt', item.original_prompt || item.prompt);
     localStorage.setItem('selectedSettings', JSON.stringify(settings));
 
     // Переходим на главную страницу
     navigate('/');
   };
 
-  const handleDelete = async (id, e) => {
-    e.stopPropagation();
+  const handlePageChange = (event, value) => {
+    setPage(value);
+  };
+
+  const handleDelete = async (id) => {
     try {
       await generationService.deleteFromHistory(id);
-      loadHistory();
+      await loadHistory();
     } catch (err) {
       console.error('Error deleting image:', err);
     }
+    setDeleteDialogOpen(false);
   };
 
-  const handleDownload = (url, prompt, e) => {
-    e.stopPropagation();
-    try {
-      const fullUrl = url.startsWith('http') ? url : `http://localhost:8000${url}`;
-      const link = document.createElement('a');
-      link.href = fullUrl;
-      link.download = `generation-${prompt.slice(0, 30)}.png`;
-      document.body.appendChild(link);
-      link.click();
-      document.body.removeChild(link);
-    } catch (err) {
-      console.error('Error downloading image:', err);
-    }
+  const handlePreviewClick = (e, imageUrl) => {
+    e.stopPropagation(); // Предотвращаем всплытие события
+    setSelectedImage(imageUrl);
+    setPreviewDialogOpen(true);
   };
+
+  if (loading) {
+    return (
+      <Box className="history-loading">
+        <CircularProgress />
+      </Box>
+    );
+  }
+
+  if (error) {
+    return (
+      <Box className="history-error">
+        <Typography color="error">{error}</Typography>
+      </Box>
+    );
+  }
 
   return (
     <Box className="history-container">
@@ -130,146 +139,92 @@ function GenerationHistory() {
         </Typography>
       </Box>
 
-      {loading ? (
-        <Box className="history-loading">
-          <CircularProgress />
-        </Box>
-      ) : error ? (
-        <Box className="history-error">
-          <Typography color="error">{error}</Typography>
-        </Box>
-      ) : (
-        <Grid container spacing={3}>
-          {history.map(item => (
-            <Grid item xs={12} sm={6} md={4} lg={3} key={item.id}>
-              <Card 
-                className="history-card"
-                onClick={() => handleCardClick(item)}
-              >
-                {item.generated_image ? (
-                  <CardMedia
-                    component="img"
-                    image={item.generated_image.startsWith('http') 
-                      ? item.generated_image 
-                      : `http://localhost:8000${item.generated_image}`}
-                    alt={item.prompt}
-                    className="history-image"
-                  />
-                ) : (
-                  <Box className="history-image-placeholder">
-                    <Typography variant="body2">
-                      Image not available
-                    </Typography>
-                  </Box>
-                )}
-                <CardContent className="history-content">
-                  <Typography className="history-prompt">
-                    {item.original_prompt || item.prompt || 'No prompt'}
+      <Grid container spacing={3}>
+        {history.map((item) => (
+          <Grid item xs={12} sm={6} md={4} lg={3} key={item.id}>
+            <Card 
+              className="history-card"
+              onClick={() => handleCardClick(item)}
+            >
+              <CardMedia
+                component="img"
+                image={item.generated_image}
+                alt={item.prompt}
+                className="history-image"
+                onClick={(e) => handlePreviewClick(e, item.generated_image)}
+              />
+              <CardContent className="history-content">
+                <Typography className="history-prompt">
+                  {item.original_prompt || item.prompt}
+                </Typography>
+                
+                <Box className="history-tags">
+                  {item.model && (
+                    <Chip label={item.model} size="small" className="history-tag" />
+                  )}
+                  {item.style && item.style !== 'none' && (
+                    <Chip label={item.style} size="small" className="history-tag" />
+                  )}
+                </Box>
+
+                <Box className="history-details">
+                  <Typography className="history-detail">
+                    <strong>Steps:</strong> {item.n_steps}
                   </Typography>
-                  <Box className="history-tags">
-                    {item.model && (
-                      <Chip 
-                        label={item.model}
-                        size="small"
-                        className="history-tag"
-                      />
-                    )}
-                    {item.style && item.style !== 'none' && (
-                      <Chip 
-                        label={item.style}
-                        size="small"
-                        className="history-tag"
-                      />
-                    )}
-                    {item.color_scheme && item.color_scheme !== 'none' && (
-                      <Chip 
-                        label={item.color_scheme}
-                        size="small"
-                        className="history-tag"
-                      />
-                    )}
-                  </Box>
-                  <Box className="history-details">
-                    <Typography variant="caption" className="history-detail">
-                      <strong>Steps:</strong> {item.n_steps || 75}
+                  <Typography className="history-detail">
+                    <strong>CFG:</strong> {item.guidance_scale}
+                  </Typography>
+                  <Typography className="history-detail">
+                    <strong>Size:</strong> {item.width}×{item.height}
+                  </Typography>
+                  {item.seed && (
+                    <Typography className="history-detail">
+                      <strong>Seed:</strong> {item.seed}
                     </Typography>
-                    <Typography variant="caption" className="history-detail">
-                      <strong>CFG:</strong> {item.guidance_scale || 7.5}
-                    </Typography>
-                    <Typography variant="caption" className="history-detail">
-                      <strong>Size:</strong> {item.width}×{item.height}
-                    </Typography>
-                    {item.seed && (
-                      <Typography variant="caption" className="history-detail">
-                        <strong>Seed:</strong> {item.seed}
-                      </Typography>
-                    )}
-                    {item.sampler && (
-                      <Typography variant="caption" className="history-detail">
-                        <strong>Sampler:</strong> {item.sampler}
-                      </Typography>
-                    )}
-                  </Box>
-                  <Box className="history-flags">
-                    {item.tiling && (
-                      <Chip 
-                        label="Tiling"
-                        size="small"
-                        className="history-flag"
-                      />
-                    )}
-                    {item.hires_fix && (
-                      <Chip 
-                        label="Hires.fix"
-                        size="small"
-                        className="history-flag"
-                      />
-                    )}
-                    {item.safety_checker && (
-                      <Chip 
-                        label="Safe"
-                        size="small"
-                        className="history-flag"
-                      />
-                    )}
-                  </Box>
-                  <Box className="history-actions">
-                    {item.generated_image && (
-                      <Tooltip title="Download">
-                        <IconButton 
-                          size="small"
-                          onClick={(e) => handleDownload(item.generated_image, item.prompt, e)}
-                        >
-                          <DownloadIcon />
-                        </IconButton>
-                      </Tooltip>
-                    )}
-                    <Tooltip title="Delete">
-                      <IconButton 
-                        size="small"
-                        onClick={(e) => handleDelete(item.id, e)}
-                      >
-                        <DeleteIcon />
-                      </IconButton>
-                    </Tooltip>
-                  </Box>
-                </CardContent>
-              </Card>
-            </Grid>
-          ))}
-        </Grid>
-      )}
+                  )}
+                </Box>
+
+                <Box className="history-actions">
+                  <IconButton
+                    size="small"
+                    onClick={(e) => {
+                      e.stopPropagation(); // Предотвращаем всплытие события
+                      setSelectedImage(item);
+                      setDeleteDialogOpen(true);
+                    }}
+                    className="history-delete"
+                  >
+                    <DeleteIcon />
+                  </IconButton>
+                </Box>
+              </CardContent>
+            </Card>
+          </Grid>
+        ))}
+      </Grid>
 
       {totalPages > 1 && (
         <Box className="history-pagination">
           <Pagination
             count={totalPages}
             page={page}
-            onChange={(e, value) => setPage(value)}
+            onChange={handlePageChange}
             color="primary"
           />
         </Box>
       )}
+
+      <DeleteConfirmDialog
+        open={deleteDialogOpen}
+        onClose={() => setDeleteDialogOpen(false)}
+        onConfirm={() => handleDelete(selectedImage?.id)}
+      />
+
+      <ImagePreviewDialog
+        open={previewDialogOpen}
+        onClose={() => setPreviewDialogOpen(false)}
+        imageUrl={selectedImage}
+      />
     </Box>
   );
 }

@@ -29,7 +29,7 @@ MODEL_CONFIG = {
                 "enabled": True
             },
             "sampler": {
-                "enabled": True,
+                "enabled": False,
                 "default": "DPM++ 2M Karras",
                 "options": [option["value"] for option in SAMPLER_OPTIONS]
             },
@@ -81,7 +81,7 @@ MODEL_CONFIG = {
                 "enabled": True
             },
             "sampler": {
-                "enabled": True,
+                "enabled": False,
                 "default": "DPM++ 2M Karras",
                 "options": ["DPM++ 2M Karras", "Euler a", "UniPC"]
             },
@@ -94,7 +94,7 @@ MODEL_CONFIG = {
                 "default": False
             },
             "hires_fix": {
-                "enabled": True,
+                "enabled": False,
                 "default": False
             },
             "negative_prompt": {
@@ -132,7 +132,7 @@ MODEL_CONFIG = {
                 "enabled": True
             },
             "sampler": {
-                "enabled": True,
+                "enabled": False,
                 "default": "Euler a",
                 "options": ["Euler a", "DPM++ 2M Karras"]
             },
